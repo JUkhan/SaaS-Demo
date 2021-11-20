@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Common\" />
+    <None Remove="Entities\" />
+    <None Remove="Entities\UserManagement\" />
+    <None Remove="Entities\MultiTenants\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Common\" />
+    <Folder Include="Entities\" />
+    <Folder Include="Entities\UserManagement\" />
+    <Folder Include="Entities\MultiTenants\" />
+  </ItemGroup>
+</Project>

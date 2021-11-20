@@ -1,0 +1,23 @@
+version: '3.4'
+
+services:
+  tenantsdb:
+    container_name: tenantsdb
+    environment:
+      SA_PASSWORD: "JuK12345678"
+      ACCEPT_EULA: "Y"
+    restart: always
+    ports:
+      - "1433:1433"
+
+  saas.api:
+    container_name: saas.api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "ConnectionStrings:UserConnectionString=Server=tenantsdb;Database=userDb;User Id=sa;Password=JuK12345678"
+      - "ConnectionStrings:TenantConnectionString=Server=tenantsdb;Database={dbName};User Id=sa;Password=JuK12345678"
+    depends_on:
+      - tenantsdb
+    ports:
+      - "8000:80"
+  
