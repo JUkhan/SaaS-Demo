@@ -24,8 +24,9 @@ namespace SaaS.Infrastructure
 
                 var connectionStringPlaceHolder = configuration["ConnectionStrings:TenantConnectionString"];
                 var httpContextAccessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
-                var obj = httpContextAccessor.HttpContext.Session.GetObjectFromJson<TenantInfo>("tenantInfo");
-                var connectionString = connectionStringPlaceHolder.Replace("{dbName}", obj.DatabaseName);
+                //var obj = httpContextAccessor.HttpContext.Session.GetObjectFromJson<TenantInfo>("tenantInfo");
+                var info = (TenantInfo)httpContextAccessor.HttpContext.Items["User"];
+                var connectionString = connectionStringPlaceHolder.Replace("{dbName}", info.DatabaseName);
                 dbContextBuilder.UseSqlServer(connectionString);
             });
             services.AddScoped(typeof(IAsyncRepository<>), typeof(TenantsRepositoryBase<>));

@@ -22,26 +22,29 @@ namespace SaaS.Api.Controllers
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
+        
         [HttpGet]
         public async Task<IActionResult> GetAllTodos()
         {
-           var tenantinfo = HttpContext.Session.GetObjectFromJson<TenantInfo>("tenantInfo");
-           return Ok(await _mediator.Send(new QueryAllTodos(tenantinfo.TenantId)));
+            var tenantinfo = GetTenantInfo(); //HttpContext.Session.GetObjectFromJson<TenantInfo>("tenantInfo");
+            
+            return Ok(await _mediator.Send(new QueryAllTodos(tenantinfo.TenantId)));
         }
 
         [HttpPost]
         public async Task<IActionResult> AddTodo([FromBody] CommandAddTodo command)
         {
-            var tenantinfo = HttpContext.Session.GetObjectFromJson<TenantInfo>("tenantInfo");
+            var tenantinfo = GetTenantInfo(); //HttpContext.Session.GetObjectFromJson<TenantInfo>("tenantInfo");
             return Ok(await _mediator.Send(command with {TenantId= tenantinfo.TenantId }));
         }
 
         [HttpPut]
         public async Task<IActionResult> UpdateTodo([FromBody] CommandUpdateTodo command)
         {
-            var tenantinfo = HttpContext.Session.GetObjectFromJson<TenantInfo>("tenantInfo");
             return Ok(await _mediator.Send(command));
         }
+
+        private TenantInfo GetTenantInfo() => (TenantInfo)HttpContext.Items["User"];
 
     }
 }

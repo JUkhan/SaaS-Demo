@@ -49,10 +49,16 @@ namespace SaaS.Api.Helpers
                 }, out SecurityToken validatedToken);
 
                 var jwtToken = (JwtSecurityToken)validatedToken;
-                var userId = int.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
-
+                //var userId = int.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
+                var tenantInfo = new TenantInfo();
+                foreach(var claim in jwtToken.Claims)
+                {
+                    if (claim.Type == "databaseName") tenantInfo.DatabaseName = claim.Value;
+                    else if (claim.Type == "tenantId") tenantInfo.TenantId = claim.Value;
+                }
                 // attach user to context on successful jwt validation
-                context.Items["User"] = context.Session.GetObjectFromJson<TenantInfo>("tenantInfo");
+                //context.Session.SetObjectAsJson("tenantInfo", tenantInfo);
+                context.Items["User"] = tenantInfo;
             }
             catch
             {

@@ -42,7 +42,8 @@ namespace SaaS.Api.Controllers
 
             // set session for tenant info
             var tenantInfo = new TenantInfo { DatabaseName = user.DatabaseName, TenantId = user.TenantId };
-            HttpContext.Session.SetObjectAsJson("tenantInfo", tenantInfo);
+            //HttpContext.Session.SetObjectAsJson("tenantInfo", tenantInfo);
+            HttpContext.Items["User"] = tenantInfo;
 
             //create tenant database and push dummy data
             var tenantDbContext = _serviceProvider.GetRequiredService <TenantDbContext>();
@@ -59,7 +60,8 @@ namespace SaaS.Api.Controllers
 
             // set session for tenant info
             var tenantInfo = new TenantInfo { DatabaseName = user.DatabaseName, TenantId = user.TenantId };
-            HttpContext.Session.SetObjectAsJson("tenantInfo", tenantInfo);
+            //HttpContext.Session.SetObjectAsJson("tenantInfo", tenantInfo);
+            HttpContext.Items["User"] = tenantInfo;
 
             return Ok(new RegisterResponse(user.UserName, user.DatabaseName, generateJwtToken(user)));
         }
@@ -75,7 +77,11 @@ namespace SaaS.Api.Controllers
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[] { new Claim("id", user.Id.ToString()), new Claim("database", user.DatabaseName) }),
+                Subject = new ClaimsIdentity(new[] {
+                    new Claim("id", user.Id.ToString()),
+                    new Claim("databaseName", user.DatabaseName),
+                    new Claim("tenantId", user.TenantId),
+                }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
