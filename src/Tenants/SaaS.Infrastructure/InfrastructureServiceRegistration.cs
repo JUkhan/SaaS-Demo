@@ -17,15 +17,14 @@ namespace SaaS.Infrastructure
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<UserMangDbContext>(options =>
-               options.UseSqlServer(configuration.GetConnectionString("UserConnectionString")));
+               options.UseSqlServer(configuration["ConnectionStrings:UserConnectionString"]));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddDbContext<TenantDbContext>((serviceProvider, dbContextBuilder) =>
             {
 
-                var connectionStringPlaceHolder = configuration.GetConnectionString("TenantConnectionString");
+                var connectionStringPlaceHolder = configuration["ConnectionStrings:TenantConnectionString"];
                 var httpContextAccessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
                 var obj = httpContextAccessor.HttpContext.Session.GetObjectFromJson<TenantInfo>("tenantInfo");
-
                 var connectionString = connectionStringPlaceHolder.Replace("{dbName}", obj.DatabaseName);
                 dbContextBuilder.UseSqlServer(connectionString);
             });

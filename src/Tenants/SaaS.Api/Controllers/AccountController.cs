@@ -14,6 +14,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Security.Claims;
 using SaaS.Api.Helpers;
+using SaaS.Api.Models;
+using static SaaS.Application.Features.Users.FindUser;
+using static SaaS.Application.Features.Users.AllUsers;
 
 namespace SaaS.Api.Controllers
 {
@@ -32,7 +35,7 @@ namespace SaaS.Api.Controllers
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
-        [HttpPost("/register")]
+        [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] CommandAU command)
         {
             var user = await _mediator.Send(command);
@@ -45,9 +48,26 @@ namespace SaaS.Api.Controllers
             var tenantDbContext = _serviceProvider.GetRequiredService <TenantDbContext>();
             await tenantDbContext.CrreateDatabaseAndPushDummyData(user.TenantId);
 
-            return Ok(new { dbName=user.DatabaseName, userName=user.UserName, token= generateJwtToken(user) });
+            return Ok(new RegisterResponse ( user.UserName, user.DatabaseName, generateJwtToken(user) ));
         }
 
+        [HttpPost("login")]
+        public async Task<IActionResult> Loggin([FromBody] QueryFindUser query)
+        {
+            var user = await _mediator.Send(query);
+            if (user == null) return Ok(new { message = "Incorrect userName or passworrd" });
+
+            // set session for tenant info
+            var tenantInfo = new TenantInfo { DatabaseName = user.DatabaseName, TenantId = user.TenantId };
+            HttpContext.Session.SetObjectAsJson("tenantInfo", tenantInfo);
+
+            return Ok(new RegisterResponse(user.UserName, user.DatabaseName, generateJwtToken(user)));
+        }
+
+        [HttpGet("allUsers")]
+        public async Task<IActionResult> AllUsers() => Ok(await _mediator.Send(new QueryAllUser()));
+       
+            
         private string generateJwtToken(User user)
         {
             // generate token that is valid for 7 days

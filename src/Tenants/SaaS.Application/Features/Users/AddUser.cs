@@ -21,13 +21,13 @@ namespace SaaS.Application.Features.Users
         {
             private IUserRepository _userRepository;
             private readonly IMapper _mapper;
-            private IServiceProvider _serviceProvider;
+           
 
             public AUHandler(IUserRepository userRepository, IMapper mapper, IServiceProvider serviceProvider)
             {
                 _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
                 _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-                _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+                
             }
 
             public async Task<User> Handle(CommandAU request, CancellationToken cancellationToken)
@@ -48,8 +48,6 @@ namespace SaaS.Application.Features.Users
 
                 //Save user record
                 user=await _userRepository.AddAsync(user);
-
-                
 
                 return user;
             }

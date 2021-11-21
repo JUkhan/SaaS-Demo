@@ -20,7 +20,8 @@ namespace SaaS.Api
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    webBuilder.UseStartup<Startup>()
+                        .UseUrls("http://localhost:4000", "http://localhost:8000");
                 });
     }
 }
